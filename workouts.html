@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Tracker - Workouts</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <h2>FitTrack</h2>
+      <nav>
+        <a href="index.html">Dashboard</a>
+        <a href="workouts.html" class="active">Workouts</a>
+        <a href="health.html">Health Goals</a>
+        <a href="nutrition.html">Nutrition</a>
+        <a href="progress.html">Progress</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="header">
+        <h1>Workouts</h1>
+        <button type="button" class="menu-btn" id="menuBtn">Menu</button>
+      </header>
+
+      <div class="workout-layout">
+        <section class="panel">
+          <h2>Log Workout</h2>
+          <form id="workoutForm" novalidate>
+            <div class="form-group">
+              <label for="exercise">Exercise</label>
+              <input type="text" id="exercise" name="exercise" placeholder="e.g. Running">
+              <p class="form-error" id="exerciseError"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="duration">Duration (minutes)</label>
+              <input type="number" id="duration" name="duration" min="1" placeholder="30">
+              <p class="form-error" id="durationError"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="date">Date</label>
+              <input type="date" id="date" name="date">
+              <p class="form-error" id="dateError"></p>
+            </div>
+
+            <button type="submit" class="btn">Add Workout</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Recent Workouts</h2>
+          <ul class="workout-list" id="workoutList">
+            <li>
+              <strong>Running</strong>
+              <span>45 min · Jun 1, 2026</span>
+            </li>
+            <li>
+              <strong>Weight Training</strong>
+              <span>60 min · May 31, 2026</span>
+            </li>
+            <li>
+              <strong>Yoga</strong>
+              <span>30 min · May 30, 2026</span>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

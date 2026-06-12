@@ -1,0 +1,81 @@
+git init<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Tracker - Dashboard</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <h2>FitTrack</h2>
+      <nav>
+        <a href="index.html" class="active">Dashboard</a>
+        <a href="workouts.html">Workouts</a>
+        <a href="health.html">Health Goals</a>
+        <a href="nutrition.html">Nutrition</a>
+        <a href="progress.html">Progress</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="header">
+        <h1>Dashboard</h1>
+        <button type="button" class="menu-btn" id="menuBtn">Menu</button>
+      </header>
+
+      <section class="stats">
+        <article class="stat-card">
+          <h3>Steps Today</h3>
+          <p>8,420</p>
+        </article>
+        <article class="stat-card">
+          <h3>Calories Burned</h3>
+          <p>520</p>
+        </article>
+        <article class="stat-card">
+          <h3>Workouts This Week</h3>
+          <p>4</p>
+        </article>
+      </section>
+
+      <section class="charts">
+        <article class="chart-box">
+          <h3>Weekly Activity (minutes)</h3>
+          <div class="bar-chart" aria-label="Weekly activity bar chart">
+            <div class="bar" style="height: 60%;"><span>Mon</span></div>
+            <div class="bar" style="height: 40%;"><span>Tue</span></div>
+            <div class="bar" style="height: 80%;"><span>Wed</span></div>
+            <div class="bar" style="height: 50%;"><span>Thu</span></div>
+            <div class="bar" style="height: 90%;"><span>Fri</span></div>
+            <div class="bar" style="height: 30%;"><span>Sat</span></div>
+            <div class="bar" style="height: 70%;"><span>Sun</span></div>
+          </div>
+        </article>
+
+        <article class="chart-box">
+          <h3>Goal Progress</h3>
+          <ul class="progress-list">
+            <li>
+              Daily steps (8,420 / 10,000)
+              <div class="progress-bar"><div class="progress-fill" style="width: 84%;"></div></div>
+            </li>
+            <li>
+              Weekly workouts (4 / 5)
+              <div class="progress-bar"><div class="progress-fill" style="width: 80%;"></div></div>
+            </li>
+            <li>
+              Water intake (6 / 8 glasses)
+              <div class="progress-bar"><div class="progress-fill" style="width: 75%;"></div></div>
+            </li>
+          </ul>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

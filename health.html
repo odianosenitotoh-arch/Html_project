@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Tracker - Health Goals</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <h2>FitTrack</h2>
+      <nav>
+        <a href="index.html">Dashboard</a>
+        <a href="workouts.html">Workouts</a>
+        <a href="health.html" class="active">Health Goals</a>
+        <a href="nutrition.html">Nutrition</a>
+        <a href="progress.html">Progress</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="header">
+        <h1>Health Goals</h1>
+        <button type="button" class="menu-btn" id="menuBtn">Menu</button>
+      </header>
+
+      <section class="stats">
+        <article class="stat-card">
+          <h3>Weight</h3>
+          <p>165 lbs</p>
+        </article>
+        <article class="stat-card">
+          <h3>Sleep (last night)</h3>
+          <p>7.5 hrs</p>
+        </article>
+        <article class="stat-card">
+          <h3>Resting Heart Rate</h3>
+          <p>72 bpm</p>
+        </article>
+      </section>
+
+      <section class="panel goals-section">
+        <div class="goals-header">
+          <h2>My Goals</h2>
+          <button type="button" class="btn" id="addGoalBtn">Add Goal</button>
+        </div>
+
+        <ul class="goals-list" id="goalsList">
+          <li>
+            <strong>Lose 5 lbs</strong>
+            <span>3 / 5 lbs</span>
+            <div class="progress-bar"><div class="progress-fill" style="width: 60%;"></div></div>
+            <button type="button" class="btn-edit">Edit</button>
+          </li>
+          <li>
+            <strong>Sleep 8 hours nightly</strong>
+            <span>7.5 / 8 hrs</span>
+            <div class="progress-bar"><div class="progress-fill" style="width: 94%;"></div></div>
+            <button type="button" class="btn-edit">Edit</button>
+          </li>
+          <li>
+            <strong>Run 100 miles</strong>
+            <span>42 / 100 miles</span>
+            <div class="progress-bar"><div class="progress-fill" style="width: 42%;"></div></div>
+            <button type="button" class="btn-edit">Edit</button>
+          </li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="goalModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">Add Goal</h2>
+        <button type="button" class="modal-close" id="closeModal">&times;</button>
+      </div>
+
+      <form id="goalForm" novalidate>
+        <div class="form-group">
+          <label for="goalName">Goal name</label>
+          <input type="text" id="goalName" name="goalName" placeholder="e.g. Drink more water">
+          <p class="form-error" id="goalNameError"></p>
+        </div>
+
+        <div class="form-group">
+          <label for="goalTarget">Target</label>
+          <input type="number" id="goalTarget" name="goalTarget" min="1" placeholder="10">
+          <p class="form-error" id="goalTargetError"></p>
+        </div>
+
+        <div class="form-group">
+          <label for="goalCurrent">Current progress</label>
+          <input type="number" id="goalCurrent" name="goalCurrent" min="0" placeholder="0">
+          <p class="form-error" id="goalCurrentError"></p>
+        </div>
+
+        <div class="form-group">
+          <label for="goalUnit">Unit (optional)</label>
+          <input type="text" id="goalUnit" name="goalUnit" placeholder="e.g. lbs, miles, glasses">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-cancel" id="cancelModal">Cancel</button>
+          <button type="submit" class="btn">Save Goal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

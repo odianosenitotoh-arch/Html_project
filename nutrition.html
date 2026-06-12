@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Tracker - Nutrition</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <h2>FitTrack</h2>
+      <nav>
+        <a href="index.html">Dashboard</a>
+        <a href="workouts.html">Workouts</a>
+        <a href="health.html">Health Goals</a>
+        <a href="nutrition.html" class="active">Nutrition</a>
+        <a href="progress.html">Progress</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="header">
+        <h1>Nutrition</h1>
+        <button type="button" class="menu-btn" id="menuBtn">Menu</button>
+      </header>
+
+      <section class="stats">
+        <article class="stat-card">
+          <h3>Calories Today</h3>
+          <p>1,845</p>
+        </article>
+        <article class="stat-card">
+          <h3>Protein (g)</h3>
+          <p>92</p>
+        </article>
+        <article class="stat-card">
+          <h3>Water Intake</h3>
+          <p>6 / 8 glasses</p>
+        </article>
+      </section>
+
+      <div class="workout-layout">
+        <section class="panel">
+          <h2>Log Meal</h2>
+          <form id="mealForm" novalidate>
+            <div class="form-group">
+              <label for="mealName">Meal Name</label>
+              <input type="text" id="mealName" name="mealName" placeholder="e.g. Chicken Salad">
+              <p class="form-error" id="mealNameError"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="mealCalories">Calories</label>
+              <input type="number" id="mealCalories" name="mealCalories" min="1" placeholder="450">
+              <p class="form-error" id="mealCaloriesError"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="mealType">Meal Type</label>
+              <select id="mealType" name="mealType">
+                <option value="">Select type...</option>
+                <option value="breakfast">Breakfast</option>
+                <option value="lunch">Lunch</option>
+                <option value="dinner">Dinner</option>
+                <option value="snack">Snack</option>
+              </select>
+              <p class="form-error" id="mealTypeError"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="mealDate">Date</label>
+              <input type="date" id="mealDate" name="mealDate">
+              <p class="form-error" id="mealDateError"></p>
+            </div>
+
+            <button type="submit" class="btn">Log Meal</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Today's Meals</h2>
+          <ul class="workout-list" id="mealList">
+            <li>
+              <strong>Breakfast - Oatmeal</strong>
+              <span>320 cal · 8:30 AM</span>
+            </li>
+            <li>
+              <strong>Lunch - Grilled Chicken Salad</strong>
+              <span>480 cal · 12:45 PM</span>
+            </li>
+            <li>
+              <strong>Snack - Protein Shake</strong>
+              <span>250 cal · 4:00 PM</span>
+            </li>
+            <li>
+              <strong>Dinner - Salmon & Vegetables</strong>
+              <span>595 cal · 7:15 PM</span>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <section class="panel">
+        <h2>Daily Macronutrients</h2>
+        <ul class="progress-list">
+          <li>
+            Protein (92 / 120g)
+            <div class="progress-bar"><div class="progress-fill" style="width: 77%;"></div></div>
+          </li>
+          <li>
+            Carbs (210 / 250g)
+            <div class="progress-bar"><div class="progress-fill" style="width: 84%;"></div></div>
+          </li>
+          <li>
+            Fats (55 / 70g)
+            <div class="progress-bar"><div class="progress-fill" style="width: 79%;"></div></div>
+          </li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

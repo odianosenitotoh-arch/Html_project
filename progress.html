@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Tracker - Progress</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <h2>FitTrack</h2>
+      <nav>
+        <a href="index.html">Dashboard</a>
+        <a href="workouts.html">Workouts</a>
+        <a href="health.html">Health Goals</a>
+        <a href="nutrition.html">Nutrition</a>
+        <a href="progress.html" class="active">Progress</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="header">
+        <h1>Progress</h1>
+        <button type="button" class="menu-btn" id="menuBtn">Menu</button>
+      </header>
+
+      <section class="stats">
+        <article class="stat-card">
+          <h3>Total Workouts</h3>
+          <p>47</p>
+        </article>
+        <article class="stat-card">
+          <h3>Total Minutes</h3>
+          <p>2,145</p>
+        </article>
+        <article class="stat-card">
+          <h3>Weight Lost</h3>
+          <p>8.5 lbs</p>
+        </article>
+      </section>
+
+      <section class="charts">
+        <article class="chart-box">
+          <h3>Monthly Activity (workouts)</h3>
+          <div class="bar-chart" aria-label="Monthly activity bar chart">
+            <div class="bar" style="height: 70%;"><span>Week 1</span></div>
+            <div class="bar" style="height: 85%;"><span>Week 2</span></div>
+            <div class="bar" style="height: 65%;"><span>Week 3</span></div>
+            <div class="bar" style="height: 90%;"><span>Week 4</span></div>
+          </div>
+        </article>
+
+        <article class="chart-box">
+          <h3>All-Time Goals</h3>
+          <ul class="progress-list">
+            <li>
+              Total Steps (127,420 / 500,000)
+              <div class="progress-bar"><div class="progress-fill" style="width: 25%;"></div></div>
+            </li>
+            <li>
+              Workouts Completed (47 / 100)
+              <div class="progress-bar"><div class="progress-fill" style="width: 47%;"></div></div>
+            </li>
+            <li>
+              Fitness Streak (12 days)
+              <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
+            </li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h2>Personal Records</h2>
+        <ul class="progress-list">
+          <li>
+            <strong>Longest Workout</strong>
+            <span>120 minutes (Running)</span>
+          </li>
+          <li>
+            <strong>Most Steps in a Day</strong>
+            <span>18,543 steps</span>
+          </li>
+          <li>
+            <strong>Highest Calories Burned</strong>
+            <span>850 calories</span>
+          </li>
+          <li>
+            <strong>Consecutive Workout Days</strong>
+            <span>12 days</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h2>Weekly Summary</h2>
+        <div style="display: grid; gap: 1rem;">
+          <div class="stat-summary">
+            <span class="summary-label">Average Daily Steps:</span>
+            <span class="summary-value">10,248</span>
+          </div>
+          <div class="stat-summary">
+            <span class="summary-label">Average Workout Duration:</span>
+            <span class="summary-value">42 minutes</span>
+          </div>
+          <div class="stat-summary">
+            <span class="summary-label">Total Calories Burned:</span>
+            <span class="summary-value">3,580</span>
+          </div>
+          <div class="stat-summary">
+            <span class="summary-label">Average Sleep:</span>
+            <span class="summary-value">7.4 hours</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
