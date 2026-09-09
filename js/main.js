@@ -1,18 +1,15 @@
-// simple function to get an element by id
 function getById(id) {
   return document.getElementById(id);
 }
 
-// set the active sidebar link for the current page
 function setActiveSidebarLink() {
   const links = document.querySelectorAll(".sidebar nav a");
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
-  links.forEach(link => {
+  links.forEach(function (link) {
     link.classList.toggle("active", link.getAttribute("href") === currentPage);
   });
 }
 
-// save/load JSON data in localStorage safely
 function loadStorage(key, fallback) {
   try {
     const item = localStorage.getItem(key);
@@ -26,24 +23,24 @@ function saveStorage(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
-// turn a date like 2026-06-10 into Jun 10, 2026
 function formatDate(dateValue) {
-  const [year, month, day] = dateValue.split("-");
+  const parts = String(dateValue).split("-");
+  const year = parts[0];
+  const month = parts[1];
+  const day = parts[2];
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return `${months[Number(month) - 1]} ${Number(day)}, ${year}`;
+  return months[Number(month) - 1] + " " + Number(day) + ", " + year;
 }
 
-// remove all error styling and messages inside a form
 function clearFormErrors(form) {
-  form.querySelectorAll(".form-error").forEach(error => {
+  form.querySelectorAll(".form-error").forEach(function (error) {
     error.textContent = "";
   });
-  form.querySelectorAll("input").forEach(input => {
+  form.querySelectorAll("input, select").forEach(function (input) {
     input.classList.remove("invalid");
   });
 }
 
-// show a message next to a field when it is invalid
 function showFieldError(input, errorId, message) {
   input.classList.add("invalid");
   const errorElement = getById(errorId);
@@ -52,10 +49,112 @@ function showFieldError(input, errorId, message) {
   }
 }
 
-// add the sidebar highlight when the page loads
-setActiveSidebarLink();
+function createTextElement(tagName, text) {
+  const element = document.createElement(tagName);
+  element.textContent = text;
+  return element;
+}
 
-// --Workouts page logic --
+function getSavedWorkouts() {
+  const workouts = loadStorage("fitnessTrackerWorkouts", []);
+  return Array.isArray(workouts) ? workouts.filter(function (workout) {
+    return workout && typeof workout.exercise === "string" &&
+      Number(workout.duration) > 0 && typeof workout.date === "string";
+  }) : [];
+}
+
+function parseStoredDate(dateValue) {
+  const parts = String(dateValue).split("-").map(Number);
+  if (parts.length !== 3 || parts.some(function (part) { return !Number.isFinite(part); })) {
+    return null;
+  }
+
+  const date = new Date(parts[0], parts[1] - 1, parts[2]);
+  return date.getFullYear() === parts[0] && date.getMonth() === parts[1] - 1 &&
+    date.getDate() === parts[2] ? date : null;
+}
+
+function getMonday(date) {
+  const monday = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const day = monday.getDay() || 7;
+  monday.setDate(monday.getDate() - day + 1);
+  return monday;
+}
+
+function setChartBars(chart, values) {
+  if (!chart) {
+    return;
+  }
+
+  const largestValue = Math.max.apply(null, values.concat([1]));
+  chart.querySelectorAll(".bar").forEach(function (bar, index) {
+    const value = values[index] || 0;
+    bar.style.height = Math.round((value / largestValue) * 100) + "%";
+  });
+}
+
+function updateDashboardFromWorkouts(workouts) {
+  const count = getById("workoutsThisWeek");
+  const chart = getById("weeklyActivityChart");
+  if (!count && !chart) {
+    return;
+  }
+
+  const today = new Date();
+  const weekStart = getMonday(today);
+  const nextWeekStart = new Date(weekStart);
+  nextWeekStart.setDate(weekStart.getDate() + 7);
+  const durations = [0, 0, 0, 0, 0, 0, 0];
+
+  workouts.forEach(function (workout) {
+    const date = parseStoredDate(workout.date);
+    if (date && date >= weekStart && date < nextWeekStart) {
+      durations[(date.getDay() + 6) % 7] += Number(workout.duration);
+    }
+  });
+
+  if (count) {
+    count.textContent = String(durations.reduce(function (total, value) {
+      return total + (value > 0 ? 1 : 0);
+    }, 0));
+  }
+  setChartBars(chart, durations);
+}
+
+function updateProgressFromWorkouts(workouts) {
+  const totalWorkouts = getById("totalWorkouts");
+  const totalMinutes = getById("totalMinutes");
+  const chart = getById("monthlyActivityChart");
+  if (!totalWorkouts && !totalMinutes && !chart) {
+    return;
+  }
+
+  const minutes = workouts.reduce(function (total, workout) {
+    return total + Number(workout.duration);
+  }, 0);
+  if (totalWorkouts) {
+    totalWorkouts.textContent = String(workouts.length);
+  }
+  if (totalMinutes) {
+    totalMinutes.textContent = String(minutes);
+  }
+
+  const now = new Date();
+  const weeks = [0, 0, 0, 0];
+  workouts.forEach(function (workout) {
+    const date = parseStoredDate(workout.date);
+    if (date && date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth()) {
+      weeks[Math.min(3, Math.floor((date.getDate() - 1) / 7))] += 1;
+    }
+  });
+  setChartBars(chart, weeks);
+}
+
+setActiveSidebarLink();
+const savedWorkouts = getSavedWorkouts();
+updateDashboardFromWorkouts(savedWorkouts);
+updateProgressFromWorkouts(savedWorkouts);
+
 const workoutForm = getById("workoutForm");
 if (workoutForm) {
   const exerciseInput = getById("exercise");
@@ -63,9 +162,7 @@ if (workoutForm) {
   const dateInput = getById("date");
   const workoutList = getById("workoutList");
   const WORKOUT_DRAFT_KEY = "fitnessTrackerWorkoutDraft";
-  const WORKOUTS_KEY = "fitnessTrackerWorkouts";
 
-  // load the draft values that were saved while typing
   function loadWorkoutDraft() {
     const draft = loadStorage(WORKOUT_DRAFT_KEY, {});
     exerciseInput.value = draft.exercise || "";
@@ -73,7 +170,6 @@ if (workoutForm) {
     dateInput.value = draft.date || "";
   }
 
-  // save the current form values to localStorage on every change
   function saveWorkoutDraft() {
     saveStorage(WORKOUT_DRAFT_KEY, {
       exercise: exerciseInput.value,
@@ -82,30 +178,15 @@ if (workoutForm) {
     });
   }
 
-  // add one workout item into the recent workouts list
   function addWorkoutToList(entry) {
     const item = document.createElement("li");
-    item.innerHTML = `<strong>${entry.exercise}</strong><span>${entry.duration} min · ${formatDate(entry.date)}</span>`;
+    item.appendChild(createTextElement("strong", entry.exercise));
+    item.appendChild(createTextElement("span", entry.duration + " min · " + formatDate(entry.date)));
     workoutList.insertBefore(item, workoutList.firstChild);
   }
 
-  // load saved workout entries from localStorage
-  function loadSavedWorkouts() {
-    const savedWorkouts = loadStorage(WORKOUTS_KEY, []);
-    savedWorkouts.forEach(addWorkoutToList);
-  }
-
-  // save a workout entry into localStorage
-  function saveWorkoutEntry(entry) {
-    const workouts = loadStorage(WORKOUTS_KEY, []);
-    workouts.unshift(entry);
-    saveStorage(WORKOUTS_KEY, workouts);
-  }
-
-  // check the workout form fields and show errors if needed
   function validateWorkoutForm() {
     clearFormErrors(workoutForm);
-
     let valid = true;
     if (exerciseInput.value.trim() === "") {
       showFieldError(exerciseInput, "exerciseError", "Please enter an exercise name.");
@@ -119,14 +200,12 @@ if (workoutForm) {
       showFieldError(dateInput, "dateError", "Please pick a date.");
       valid = false;
     }
-
     return valid;
   }
 
   workoutForm.addEventListener("input", saveWorkoutDraft);
   workoutForm.addEventListener("submit", function (event) {
     event.preventDefault();
-
     if (!validateWorkoutForm()) {
       return;
     }
@@ -136,18 +215,96 @@ if (workoutForm) {
       duration: durationInput.value,
       date: dateInput.value
     };
-
     addWorkoutToList(workoutEntry);
-    saveWorkoutEntry(workoutEntry);
+    const workouts = getSavedWorkouts();
+    workouts.unshift(workoutEntry);
+    saveStorage("fitnessTrackerWorkouts", workouts);
     localStorage.removeItem(WORKOUT_DRAFT_KEY);
     workoutForm.reset();
   });
 
   loadWorkoutDraft();
-  loadSavedWorkouts();
+  getSavedWorkouts().forEach(addWorkoutToList);
 }
 
-// -------- Health goals page logic --------
+const mealForm = getById("mealForm");
+if (mealForm) {
+  const mealName = getById("mealName");
+  const mealCalories = getById("mealCalories");
+  const mealType = getById("mealType");
+  const mealDate = getById("mealDate");
+  const mealList = getById("mealList");
+  const MEALS_KEY = "fitnessTrackerMeals";
+  const SAMPLE_MEALS = [
+    { name: "Oatmeal", calories: 320, type: "Breakfast", time: "8:30 AM" },
+    { name: "Grilled Chicken Salad", calories: 480, type: "Lunch", time: "12:45 PM" },
+    { name: "Protein Shake", calories: 250, type: "Snack", time: "4:00 PM" },
+    { name: "Salmon & Vegetables", calories: 595, type: "Dinner", time: "7:15 PM" }
+  ];
+
+  function getMeals() {
+    const storedMeals = loadStorage(MEALS_KEY, null);
+    return Array.isArray(storedMeals) ? storedMeals : SAMPLE_MEALS.slice();
+  }
+
+  function addMealToList(meal) {
+    const item = document.createElement("li");
+    const type = meal.type ? meal.type.charAt(0).toUpperCase() + meal.type.slice(1) : "Meal";
+    const detail = meal.time ? meal.calories + " cal · " + meal.time :
+      meal.calories + " cal · " + formatDate(meal.date);
+    item.appendChild(createTextElement("strong", type + " - " + meal.name));
+    item.appendChild(createTextElement("span", detail));
+    mealList.appendChild(item);
+  }
+
+  function renderMeals(meals) {
+    mealList.replaceChildren();
+    meals.forEach(addMealToList);
+  }
+
+  function validateMealForm() {
+    clearFormErrors(mealForm);
+    let valid = true;
+    if (mealName.value.trim() === "") {
+      showFieldError(mealName, "mealNameError", "Please enter a meal name.");
+      valid = false;
+    }
+    if (mealCalories.value === "" || Number(mealCalories.value) < 1) {
+      showFieldError(mealCalories, "mealCaloriesError", "Calories must be at least 1.");
+      valid = false;
+    }
+    if (mealType.value === "") {
+      showFieldError(mealType, "mealTypeError", "Please select a meal type.");
+      valid = false;
+    }
+    if (mealDate.value === "") {
+      showFieldError(mealDate, "mealDateError", "Please pick a date.");
+      valid = false;
+    }
+    return valid;
+  }
+
+  mealForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    if (!validateMealForm()) {
+      return;
+    }
+
+    const meals = getMeals();
+    meals.unshift({
+      name: mealName.value.trim(),
+      calories: mealCalories.value,
+      type: mealType.value,
+      date: mealDate.value
+    });
+    saveStorage(MEALS_KEY, meals);
+    renderMeals(meals);
+    mealForm.reset();
+  });
+
+  renderMeals(getMeals());
+}
+
 const goalModal = getById("goalModal");
 const goalForm = getById("goalForm");
 if (goalModal && goalForm) {
@@ -164,32 +321,46 @@ if (goalModal && goalForm) {
   const GOAL_DRAFT_KEY = "fitnessTrackerGoalDraft";
   let editingGoalItem = null;
 
-  // create a list item for one goal
   function createGoalListItem(goal) {
-    const percent = Math.min(100, (Number(goal.current) / Number(goal.target)) * 100);
+    const target = Number(goal.target);
+    const current = Number(goal.current);
+    const percent = Number.isFinite(target) && target > 0 && Number.isFinite(current) ?
+      Math.max(0, Math.min(100, (current / target) * 100)) : 0;
     const item = document.createElement("li");
     item.dataset.name = goal.name;
     item.dataset.target = goal.target;
     item.dataset.current = goal.current;
     item.dataset.unit = goal.unit;
-    item.innerHTML =
-      `<strong>${goal.name}</strong>` +
-      `<span>${goal.current} / ${goal.target}${goal.unit ? ` ${goal.unit}` : ""}</span>` +
-      `<div class="progress-bar"><div class="progress-fill" style="width: ${percent}%;"></div></div>` +
-      `<button type="button" class="btn-edit">Edit</button>`;
+
+    item.appendChild(createTextElement("strong", goal.name));
+    item.appendChild(createTextElement("span",
+      goal.current + " / " + goal.target + (goal.unit ? " " + goal.unit : "")));
+
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar";
+    const progressFill = document.createElement("div");
+    progressFill.className = "progress-fill";
+    progressFill.style.width = percent + "%";
+    progressBar.appendChild(progressFill);
+    item.appendChild(progressBar);
+
+    const editButton = createTextElement("button", "Edit");
+    editButton.type = "button";
+    editButton.className = "btn-edit";
+    item.appendChild(editButton);
     return item;
   }
 
-  // show a list of goals in the page
   function renderGoals(goals) {
-    goalsList.innerHTML = "";
-    goals.forEach(goal => goalsList.appendChild(createGoalListItem(goal)));
+    goalsList.replaceChildren();
+    goals.forEach(function (goal) {
+      goalsList.appendChild(createGoalListItem(goal));
+    });
   }
 
-  // load goals from storage or use sample data the first time
   function loadGoals() {
     const storedGoals = loadStorage(GOALS_KEY, []);
-    if (storedGoals.length > 0) {
+    if (Array.isArray(storedGoals) && storedGoals.length > 0) {
       renderGoals(storedGoals);
     } else {
       renderGoals([
@@ -200,18 +371,18 @@ if (goalModal && goalForm) {
     }
   }
 
-  // save the current goal list in storage
   function saveGoals() {
-    const goals = Array.from(goalsList.children).map(item => ({
-      name: item.dataset.name,
-      target: item.dataset.target,
-      current: item.dataset.current,
-      unit: item.dataset.unit
-    }));
+    const goals = Array.from(goalsList.children).map(function (item) {
+      return {
+        name: item.dataset.name,
+        target: item.dataset.target,
+        current: item.dataset.current,
+        unit: item.dataset.unit
+      };
+    });
     saveStorage(GOALS_KEY, goals);
   }
 
-  // save the modal form values while typing
   function saveGoalDraft() {
     saveStorage(GOAL_DRAFT_KEY, {
       name: goalName.value,
@@ -221,7 +392,6 @@ if (goalModal && goalForm) {
     });
   }
 
-  // open the modal, either to add a new goal or edit an existing one
   function openGoalModal(item) {
     editingGoalItem = item;
     clearFormErrors(goalForm);
@@ -241,11 +411,9 @@ if (goalModal && goalForm) {
       goalCurrent.value = draft.current || "";
       goalUnit.value = draft.unit || "";
     }
-
     goalModal.classList.add("open");
   }
 
-  // close the modal and clear its state
   function closeGoalModal() {
     goalModal.classList.remove("open");
     editingGoalItem = null;
@@ -253,10 +421,8 @@ if (goalModal && goalForm) {
     clearFormErrors(goalForm);
   }
 
-  // check the goal form and show errors when needed
   function validateGoalForm() {
     clearFormErrors(goalForm);
-
     let valid = true;
     if (goalName.value.trim() === "") {
       showFieldError(goalName, "goalNameError", "Please enter a goal name.");
@@ -270,7 +436,6 @@ if (goalModal && goalForm) {
       showFieldError(goalCurrent, "goalCurrentError", "Current progress cannot be negative.");
       valid = false;
     }
-
     return valid;
   }
 
@@ -285,14 +450,11 @@ if (goalModal && goalForm) {
     }
   });
   goalForm.addEventListener("input", saveGoalDraft);
-
   goalsList.addEventListener("click", function (event) {
     if (event.target.matches(".btn-edit")) {
-      const listItem = event.target.closest("li");
-      openGoalModal(listItem);
+      openGoalModal(event.target.closest("li"));
     }
   });
-
   goalForm.addEventListener("submit", function (event) {
     event.preventDefault();
     if (!validateGoalForm()) {
@@ -305,14 +467,11 @@ if (goalModal && goalForm) {
       current: goalCurrent.value,
       unit: goalUnit.value.trim()
     };
-
     if (editingGoalItem) {
-      const newItem = createGoalListItem(goal);
-      editingGoalItem.replaceWith(newItem);
+      editingGoalItem.replaceWith(createGoalListItem(goal));
     } else {
       goalsList.prepend(createGoalListItem(goal));
     }
-
     saveGoals();
     localStorage.removeItem(GOAL_DRAFT_KEY);
     closeGoalModal();
@@ -320,77 +479,3 @@ if (goalModal && goalForm) {
 
   loadGoals();
 }
-
-  function showGoalError(input, errorId, message) {
-    input.classList.add("invalid");
-    document.getElementById(errorId).textContent = message;
-  }
-
-  function getProgressPercent(current, target) {
-    var percent = (Number(current) / Number(target)) * 100;
-    if (percent > 100) {
-      percent = 100;
-    }
-    return percent;
-  }
-
-  function buildGoalHtml(name, target, current, unit) {
-    var unitText = unit ? " " + unit : "";
-    var percent = getProgressPercent(current, target);
-
-    return (
-      "<strong>" + name + "</strong>" +
-      "<span>" + current + " / " + target + unitText + "</span>" +
-      '<div class="progress-bar"><div class="progress-fill" style="width: ' + percent + '%;"></div></div>' +
-      '<button type="button" class="btn-edit">Edit</button>'
-    );
-  }
-
-  function setGoalData(item, name, target, current, unit) {
-    item.setAttribute("data-name", name);
-    item.setAttribute("data-target", target);
-    item.setAttribute("data-current", current);
-    item.setAttribute("data-unit", unit);
-    item.innerHTML = buildGoalHtml(name, target, current, unit);
-  }
-
-  function addGoalItem(name, target, current, unit) {
-    var item = document.createElement("li");
-    setGoalData(item, name, target, current, unit);
-    goalsList.insertBefore(item, goalsList.firstChild);
-  }
-
-  function updateGoalItem(item, name, target, current, unit) {
-    setGoalData(item, name, target, current, unit);
-  }
-
-  function saveGoalsToStorage() {
-    var goals = [];
-    var items = goalsList.querySelectorAll("li");
-    for (var i = 0; i < items.length; i++) {
-      var item = items[i];
-      goals.push({
-        name: item.getAttribute("data-name"),
-        target: item.getAttribute("data-target"),
-        current: item.getAttribute("data-current"),
-        unit: item.getAttribute("data-unit")
-      });
-    }
-    setStoredData(goalsStorageKey, goals);
-  }
-
-  function setSampleGoalData() {
-    var sampleGoals = goalsList.querySelectorAll("li");
-    var sampleData = [
-      { name: "Lose 5 lbs", target: "5", current: "3", unit: "lbs" },
-      { name: "Sleep 8 hours nightly", target: "8", current: "7.5", unit: "hrs" },
-      { name: "Run 100 miles", target: "100", current: "42", unit: "miles" }
-    ];
-
-    for (var k = 0; k < sampleGoals.length; k++) {
-      if (sampleData[k]) {
-        setGoalData(sampleGoals[k], sampleData[k].name, sampleData[k].target, sampleData[k].current, sampleData[k].unit);
-      }
-    }
-  }
-
