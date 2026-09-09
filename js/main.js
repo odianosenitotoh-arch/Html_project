@@ -105,18 +105,18 @@ function updateDashboardFromWorkouts(workouts) {
   const nextWeekStart = new Date(weekStart);
   nextWeekStart.setDate(weekStart.getDate() + 7);
   const durations = [0, 0, 0, 0, 0, 0, 0];
+  let weeklyWorkoutCount = 0;
 
   workouts.forEach(function (workout) {
     const date = parseStoredDate(workout.date);
     if (date && date >= weekStart && date < nextWeekStart) {
       durations[(date.getDay() + 6) % 7] += Number(workout.duration);
+      weeklyWorkoutCount += 1;
     }
   });
 
   if (count) {
-    count.textContent = String(durations.reduce(function (total, value) {
-      return total + (value > 0 ? 1 : 0);
-    }, 0));
+    count.textContent = String(weeklyWorkoutCount);
   }
   setChartBars(chart, durations);
 }
